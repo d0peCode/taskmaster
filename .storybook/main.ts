@@ -7,16 +7,15 @@ const config: StorybookConfig = {
   ],
   addons: [
     "@storybook/addon-onboarding",
-    "@chromatic-com/storybook",
-    "@storybook/addon-docs",
+    "@storybook/addon-essentials",
     "@storybook/addon-a11y",
-    "@storybook/addon-vitest",
     "@storybook/addon-interactions",
-    'storybook-addon-pinia',
+    "@chromatic-com/storybook",
+    "@storybook/addon-vitest",
   ],
   framework: {
     name: "@storybook/vue3-vite",
     options: {}
-  }
+  },
 };
 export default config;
