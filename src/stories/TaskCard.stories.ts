@@ -4,11 +4,8 @@ import type { Task, TaskStatus } from '@/types/Task';
 import { fn, userEvent, within, expect } from '@storybook/test';
 import { format as formatDateFn } from 'date-fns';
 
-// Define argument tuple types for mock functions
 type TaskIdArgs = [taskId: string];
-// type NoArgs = []; // Example if an event had no arguments
 
-// Helper to create a sample task
 const createSampleTask = (overrides: Partial<Task> = {}): Task => ({
     id: 'task-storybook-1',
     title: 'Sample Storybook Task',
@@ -50,7 +47,7 @@ export const PendingTask: Story = {
         onEdit: fn<TaskIdArgs, void>(),
         onDelete: fn<TaskIdArgs, void>(),
         onToggleComplete: fn<TaskIdArgs, void>(),
-        onTogglePending: fn<TaskIdArgs, void>(), // Will also take taskId
+        onTogglePending: fn<TaskIdArgs, void>(),
     },
     play: async ({ canvasElement, args }) => {
         const canvas = within(canvasElement);

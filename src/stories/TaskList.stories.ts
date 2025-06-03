@@ -1,4 +1,3 @@
-// src/components/TaskList.stories.ts
 import type { Meta, StoryObj } from '@storybook/vue3';
 import { createPinia, setActivePinia } from 'pinia';
 import TaskList from '../components/TaskList.vue';
@@ -8,7 +7,7 @@ import { userEvent, within, expect } from '@storybook/test';
 
 const createSampleTask = (id: string, overrides: Partial<Task> = {}): Task => ({
     id,
-    title: `Task ${id}`, // Default title pattern
+    title: `Task ${id}`,
     description: `Description for task ${id}. Lorem ipsum dolor sit amet.`,
     dueDate: new Date(new Date().setDate(new Date().getDate() + parseInt(id))).toISOString(),
     status: 'pending',
