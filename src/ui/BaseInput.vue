@@ -53,7 +53,7 @@ const props = withDefaults(defineProps<Props>(), {
   required: false,
   errorMessage: null,
   autocomplete: 'off',
-  id: undefined, // Will be auto-generated if not provided
+  id: undefined,
 });
 
 const emit = defineEmits<{
