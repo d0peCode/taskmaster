@@ -2,6 +2,9 @@
 import { ref, watch, computed } from 'vue';
 import type { Task, TaskStatus } from '@/types/Task';
 import BaseButton from '@/ui/BaseButton.vue';
+import BaseInput from '@/ui/BaseInput.vue';
+import BaseSelect from '@/ui/BaseSelect.vue';
+import type { SelectOption } from '@/ui/BaseSelect.vue';
 import { format as formatDateFn, parseISO } from 'date-fns';
 
 interface FormData {
@@ -33,6 +36,12 @@ const initialFormData = (): FormData => ({
 
 const formData = ref<FormData>(initialFormData());
 const errors = ref<{ title?: string; dueDate?: string }>({});
+
+const statusOptions = ref<SelectOption[]>([
+  { value: 'pending', label: 'Pending' },
+  { value: 'in-progress', label: 'In Progress' },
+  { value: 'completed', label: 'Completed' },
+]);
 
 watch(() => props.taskToEdit, (task) => {
   if (task) {
@@ -67,7 +76,6 @@ const handleSubmit = () => {
       emit('submit-task', {
         ...props.taskToEdit,
         ...formData.value,
-        dueDate: formData.value.dueDate
       });
     } else {
       const taskDataToSubmit: Omit<Task, 'id' | 'createdAt'> = {
@@ -88,54 +96,49 @@ const handleCancel = () => {
 <template>
   <form @submit.prevent="handleSubmit" class="space-y-6 p-4 bg-white shadow-md rounded-lg border border-gray-200">
     <div>
-      <label for="task-title" class="block text-sm font-medium text-gray-700">Title</label>
-      <input
-          type="text"
-          id="task-title"
-          v-model="formData.title"
-          required
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
-          :class="{ 'border-red-500': errors.title }"
+      <BaseInput
+        v-model="formData.title"
+        label="Title"
+        id="task-title"
+        type="text"
+        :required="true"
+        :error-message="errors.title"
+        placeholder="e.g., Buy groceries"
       />
-      <p v-if="errors.title" class="mt-1 text-xs text-red-600">{{ errors.title }}</p>
     </div>
 
     <div>
       <label for="task-description" class="block text-sm font-medium text-gray-700">Description</label>
       <textarea
-          id="task-description"
-          v-model="formData.description"
-          rows="4"
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
+        id="task-description"
+        v-model="formData.description"
+        rows="4"
+        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
+        placeholder="e.g., Milk, eggs, bread, and cheese"
       ></textarea>
     </div>
 
     <div>
-      <label for="task-dueDate" class="block text-sm font-medium text-gray-700">Due Date</label>
-      <input
-          type="date"
-          id="task-dueDate"
-          v-model="formData.dueDate"
-          required
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
-          :class="{ 'border-red-500': errors.dueDate }"
+      <BaseInput
+        v-model="formData.dueDate"
+        label="Due Date"
+        id="task-dueDate"
+        type="date"
+        :required="true"
+        :error-message="errors.dueDate"
       />
-      <p v-if="errors.dueDate" class="mt-1 text-xs text-red-600">{{ errors.dueDate }}</p>
     </div>
 
-    <div v-if="isEditMode" class="col-span-full">
-      <label for="task-status" class="block text-sm font-medium text-gray-700">Status</label>
-      <select
-          id="task-status"
-          v-model="formData.status"
-          class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500 text-sm"
-      >
-        <option value="pending">Pending</option>
-        <option value="in-progress">In Progress</option>
-        <option value="completed">Completed</option>
-      </select>
+    <div v-if="isEditMode">
+      <BaseSelect
+        v-model="formData.status"
+        label="Status"
+        id="task-status"
+        :options="statusOptions"
+        option-value-key="value"
+        option-text-key="label"
+      />
     </div>
-
 
     <div class="flex justify-end space-x-3 pt-4">
       <BaseButton type="button" variant="secondary" @click="handleCancel">

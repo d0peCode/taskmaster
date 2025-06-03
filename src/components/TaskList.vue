@@ -3,9 +3,11 @@ import { ref, computed, defineEmits } from 'vue';
 import { useTaskStore } from '@/stores/task.store';
 import TaskCard from '@/components/TaskCard.vue';
 import BaseInput from '@/ui/BaseInput.vue';
+import BaseSelect from '@/ui/BaseSelect.vue';
+import type { SelectOption } from '@/ui/BaseSelect.vue';
 import type { Task, TaskStatus } from '@/types/Task';
 
-type SortCriteria =
+type SortCriteriaValue =
     | 'createdAtDesc'
     | 'createdAtAsc'
     | 'dueDateAsc'
@@ -21,7 +23,23 @@ const emit = defineEmits<{
 
 const searchQuery = ref('');
 const selectedStatusFilter = ref<TaskStatus | 'all'>('all');
-const selectedSortCriteria = ref<SortCriteria>('createdAtDesc');
+const selectedSortCriteria = ref<SortCriteriaValue>('createdAtDesc');
+
+const statusFilterOptions = ref<SelectOption[]>([
+  { value: 'all', label: 'All Statuses' },
+  { value: 'pending', label: 'Pending' },
+  { value: 'in-progress', label: 'In Progress' },
+  { value: 'completed', label: 'Completed' },
+]);
+
+const sortCriteriaOptions = ref<SelectOption[]>([
+  { value: 'createdAtDesc', label: 'Created (Newest)' },
+  { value: 'createdAtAsc', label: 'Created (Oldest)' },
+  { value: 'dueDateAsc', label: 'Due Date (Soonest)' },
+  { value: 'dueDateDesc', label: 'Due Date (Latest)' },
+  { value: 'titleAsc', label: 'Title (A-Z)' },
+  { value: 'titleDesc', label: 'Title (Z-A)' },
+]);
 
 const tasksToDisplay = computed(() => {
   let displayedTasks: Task[] = [...taskStore.tasks];
@@ -85,43 +103,36 @@ const handleToggleInProgressTask = (taskId: string) => {
     <div class="controls-bar flex flex-col sm:flex-row justify-between items-center gap-4 p-4 bg-gray-50 rounded-lg shadow mb-6">
       <div class="search-tasks flex-grow sm:flex-grow-0 sm:mr-4 w-full sm:w-auto">
         <BaseInput
-            v-model="searchQuery"
-            placeholder="Search by title or description..."
-            type="search"
-            id="task-search"
-            label="Search Tasks"
-            :label-sr-only="true"
+          v-model="searchQuery"
+          placeholder="Search by title or description..."
+          type="search"
+          id="task-search"
+          label="Search Tasks"
         />
       </div>
       <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
         <div class="filter-status">
-          <label for="status-filter" class="sr-only sm:not-sr-only mr-2 text-sm font-medium text-gray-700">Filter by Status:</label>
-          <select
-              id="status-filter"
-              v-model="selectedStatusFilter"
-              class="p-2 border border-gray-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500 text-sm w-full"
-          >
-            <option value="all">All Statuses</option>
-            <option value="pending">Pending</option>
-            <option value="in-progress">In Progress</option>
-            <option value="completed">Completed</option>
-          </select>
+          <BaseSelect
+            v-model="selectedStatusFilter"
+            label="Filter by Status:"
+            id="status-filter"
+            :options="statusFilterOptions"
+            option-value-key="value"
+            option-text-key="label"
+            class="w-full"
+          />
         </div>
 
         <div class="sort-tasks">
-          <label for="sort-criteria" class="sr-only sm:not-sr-only mr-2 text-sm font-medium text-gray-700">Sort by:</label>
-          <select
-              id="sort-criteria"
-              v-model="selectedSortCriteria"
-              class="p-2 border border-gray-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500 text-sm w-full"
-          >
-            <option value="createdAtDesc">Created (Newest)</option>
-            <option value="createdAtAsc">Created (Oldest)</option>
-            <option value="dueDateAsc">Due Date (Soonest)</option>
-            <option value="dueDateDesc">Due Date (Latest)</option>
-            <option value="titleAsc">Title (A-Z)</option>
-            <option value="titleDesc">Title (Z-A)</option>
-          </select>
+          <BaseSelect
+            v-model="selectedSortCriteria"
+            label="Sort by:"
+            id="sort-criteria"
+            :options="sortCriteriaOptions"
+            option-value-key="value"
+            option-text-key="label"
+            class="w-full"
+          />
         </div>
       </div>
     </div>
