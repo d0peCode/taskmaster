@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
-import BaseButton from '../ui/BaseButton.vue';
+import BaseButton from '@/ui/BaseButton.vue';
 import { userEvent, within, expect, fn } from '@storybook/test';
+
+type OnClickArgs = [event: MouseEvent];
 
 const meta: Meta<typeof BaseButton> = {
     title: 'UI/BaseButton',
@@ -13,7 +15,7 @@ const meta: Meta<typeof BaseButton> = {
         },
         variant: {
             control: { type: 'select' },
-            options: ['primary', 'secondary', 'danger', 'success', 'warning', 'ghost'],
+            options: ['primary', 'secondary', 'danger', 'success', 'warning', 'ghost', 'info'],
         },
         size: {
             control: { type: 'select' },
@@ -40,12 +42,12 @@ export const Primary: Story = {
     args: {
         variant: 'primary',
         default: 'Primary Button',
-        onClick: fn(),
+        onClick: fn<OnClickArgs, void>(),
     },
     play: async ({ canvasElement, args }) => {
         const canvas = within(canvasElement);
         const buttonElement = canvas.getByRole('button', { name: /Primary Button/i });
-        const onClickMock = args.onClick as ReturnType<typeof fn>;
+        const onClickMock = args.onClick as ReturnType<typeof fn<OnClickArgs, void>>;
 
         await expect(buttonElement).not.toBeDisabled();
 
@@ -69,12 +71,12 @@ export const Secondary: Story = {
     args: {
         variant: 'secondary',
         default: 'Secondary Button',
-        onClick: fn(),
+        onClick: fn<OnClickArgs, void>(),
     },
     play: async ({ canvasElement, args }) => {
         const canvas = within(canvasElement);
         const buttonElement = canvas.getByRole('button', { name: /Secondary Button/i });
-        const onClickMock = args.onClick as ReturnType<typeof fn>;
+        const onClickMock = args.onClick as ReturnType<typeof fn<OnClickArgs, void>>;
 
         onClickMock.mockClear();
         await userEvent.click(buttonElement);
@@ -86,7 +88,7 @@ export const Danger: Story = {
     args: {
         variant: 'danger',
         default: 'Danger Button',
-        onClick: fn(),
+        onClick: fn<OnClickArgs, void>(),
     },
 };
 
@@ -94,7 +96,7 @@ export const Success: Story = {
     args: {
         variant: 'success',
         default: 'Success Button',
-        onClick: fn(),
+        onClick: fn<OnClickArgs, void>(),
     },
 };
 
@@ -102,7 +104,7 @@ export const Warning: Story = {
     args: {
         variant: 'warning',
         default: 'Warning Button',
-        onClick: fn(),
+        onClick: fn<OnClickArgs, void>(),
     },
 };
 
@@ -110,7 +112,24 @@ export const Ghost: Story = {
     args: {
         variant: 'ghost',
         default: 'Ghost Button',
-        onClick: fn(),
+        onClick: fn<OnClickArgs, void>(),
+    },
+};
+
+export const Info: Story = {
+    args: {
+        variant: 'info',
+        default: 'Info Button',
+        onClick: fn<OnClickArgs, void>(),
+    },
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const buttonElement = canvas.getByRole('button', { name: /Info Button/i });
+        const onClickMock = args.onClick as ReturnType<typeof fn<OnClickArgs, void>>;
+
+        onClickMock.mockClear();
+        await userEvent.click(buttonElement);
+        await expect(onClickMock).toHaveBeenCalledTimes(1);
     },
 };
 
@@ -119,16 +138,35 @@ export const OutlinePrimary: Story = {
         variant: 'primary',
         outline: true,
         default: 'Outline Primary',
-        onClick: fn(),
+        onClick: fn<OnClickArgs, void>(),
     },
 };
+
+export const OutlineInfo: Story = {
+    args: {
+        variant: 'info',
+        outline: true,
+        default: 'Outline Info',
+        onClick: fn<OnClickArgs, void>(),
+    },
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const buttonElement = canvas.getByRole('button', { name: /Outline Info/i });
+        const onClickMock = args.onClick as ReturnType<typeof fn<OnClickArgs, void>>;
+
+        onClickMock.mockClear();
+        await userEvent.click(buttonElement);
+        await expect(onClickMock).toHaveBeenCalledTimes(1);
+    },
+};
+
 
 export const PillButton: Story = {
     args: {
         variant: 'primary',
         pill: true,
         default: 'Pill Button',
-        onClick: fn(),
+        onClick: fn<OnClickArgs, void>(),
     },
 };
 
@@ -137,7 +175,7 @@ export const LargePrimary: Story = {
         variant: 'primary',
         size: 'lg',
         default: 'Large Primary',
-        onClick: fn(),
+        onClick: fn<OnClickArgs, void>(),
     },
 };
 
@@ -146,7 +184,7 @@ export const SmallSecondary: Story = {
         variant: 'secondary',
         size: 'sm',
         default: 'Small Secondary',
-        onClick: fn(),
+        onClick: fn<OnClickArgs, void>(),
     },
 };
 
@@ -155,16 +193,17 @@ export const Disabled: Story = {
         variant: 'primary',
         disabled: true,
         default: 'Disabled Button',
-        onClick: fn(),
+        onClick: fn<OnClickArgs, void>(),
     },
     play: async ({ canvasElement, args }) => {
         const canvas = within(canvasElement);
         const buttonElement = canvas.getByRole('button', { name: /Disabled Button/i });
-        const onClickMock = args.onClick as ReturnType<typeof fn>;
+        const onClickMock = args.onClick as ReturnType<typeof fn<OnClickArgs, void>>;
 
         await expect(buttonElement).toBeDisabled();
 
         onClickMock.mockClear();
+
         await userEvent.click(buttonElement, { pointerEventsCheck: 0 });
         await expect(onClickMock).not.toHaveBeenCalled();
     },
@@ -175,16 +214,17 @@ export const Loading: Story = {
         variant: 'primary',
         isLoading: true,
         default: 'Loading...',
-        onClick: fn(),
+        onClick: fn<OnClickArgs, void>(),
     },
     play: async ({ canvasElement, args }) => {
         const canvas = within(canvasElement);
         const buttonElement = canvas.getByRole('button', { name: /Processing.../i });
-        const onClickMock = args.onClick as ReturnType<typeof fn>;
+        const onClickMock = args.onClick as ReturnType<typeof fn<OnClickArgs, void>>;
 
         await expect(buttonElement).toHaveAttribute('disabled');
 
         onClickMock.mockClear();
+
         await userEvent.click(buttonElement, { pointerEventsCheck: 0 });
         await expect(onClickMock).not.toHaveBeenCalled();
     },
@@ -195,7 +235,7 @@ export const FullWidth: Story = {
         variant: 'primary',
         block: true,
         default: 'Full Width Button',
-        onClick: fn(),
+        onClick: fn<OnClickArgs, void>(),
     },
 };
 
@@ -209,13 +249,14 @@ export const WithCustomContent: Story = {
     }),
     args: {
         variant: 'secondary',
-        onClick: fn(),
+        onClick: fn<OnClickArgs, void>(),
     },
     play: async ({ canvasElement, args }) => {
         const canvas = within(canvasElement);
-        const buttonElement = canvas.getByRole('button', { name: /Custom HTML Content/i });
-        const onClickMock = args.onClick as ReturnType<typeof fn>;
+        const buttonElement = canvas.getByRole('button');
+        expect(buttonElement.innerHTML).toContain('<em>Custom HTML</em> Content');
 
+        const onClickMock = args.onClick as ReturnType<typeof fn<OnClickArgs, void>>;
         onClickMock.mockClear();
         await userEvent.click(buttonElement);
         await expect(onClickMock).toHaveBeenCalledTimes(1);

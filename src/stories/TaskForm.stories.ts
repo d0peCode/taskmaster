@@ -1,14 +1,11 @@
-// src/components/TaskForm.stories.ts
 import type { Meta, StoryObj } from '@storybook/vue3';
 import TaskForm from '../components/TaskForm.vue';
 import type { Task, TaskStatus } from '@/types/Task';
 import { fn, userEvent, within, expect } from '@storybook/test';
 import { format as formatDateFn } from 'date-fns';
 
-// Define the expected signature for the submit-task payload
 type SubmitTaskPayload = Omit<Task, 'id' | 'createdAt'> | Task;
 
-// Define argument tuple types for mock functions
 type OnSubmitTaskArgs = [taskData: SubmitTaskPayload];
 type OnCancelArgs = [];
 
@@ -31,9 +28,6 @@ const meta: Meta<typeof TaskForm> = {
             control: 'object',
             description: 'Task object to pre-fill the form for editing. Null for add mode.',
         },
-        // For Storybook Actions panel (optional, ensure keys match what TS accepts for args if used)
-        // 'onSubmit-task': { action: 'onSubmitTaskEvent' },
-        // onCancel: { action: 'onCancelEvent' },
     },
 };
 
