@@ -5,6 +5,10 @@ To run the project:
 - `pnpm i`
 - `pnpm dev`
 
+To run storybook:
+
+- `pnpm storybook`
+
 Node version: 20+
 
 # Dependencies
