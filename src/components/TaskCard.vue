@@ -14,6 +14,7 @@ const emit = defineEmits<{
   (e: 'delete', taskId: string): void;
   (e: 'toggleComplete', taskId: string): void;
   (e: 'togglePending', taskId: string): void;
+  (e: 'toggleInProgress', taskId: string): void;
 }>();
 
 const formatDate = (dateInput: string | Date | undefined | null, outputFormat: string = 'MMMM d, yyyy'): string => {
@@ -35,7 +36,7 @@ const statusBadgeClasses = (status: TaskStatus): string => {
     case 'pending':
       return 'bg-yellow-100 text-yellow-800';
     case 'in-progress':
-      return 'bg-blue-100 text-blue-800';
+      return 'bg-sky-100 text-sky-800';
     case 'completed':
       return 'bg-green-100 text-green-800';
     default:
@@ -48,7 +49,7 @@ const statusBorderColor = computed(() => {
     case 'pending':
       return 'border-yellow-300';
     case 'in-progress':
-      return 'border-blue-300';
+      return 'border-sky-300';
     case 'completed':
       return 'border-green-300';
     default:
@@ -60,8 +61,8 @@ const onEdit = () => emit('edit', props.task.id);
 const onDelete = () => emit('delete', props.task.id);
 const onToggleComplete = () => emit('toggleComplete', props.task.id);
 const onTogglePending = () => emit('togglePending', props.task.id);
+const onToggleInProgress = () => emit('toggleInProgress', props.task.id);
 </script>
-
 <template>
   <BaseCard :border-color="statusBorderColor" class="hover:shadow-lg transition-shadow duration-300 ease-in-out">
     <template #header>
@@ -83,11 +84,22 @@ const onTogglePending = () => emit('togglePending', props.task.id);
     </div>
 
     <template #footer>
-      <div class="flex justify-end space-x-2">
+      <div class="flex flex-wrap justify-end gap-2">
         <BaseButton variant="secondary" size="sm" outline @click="onEdit">Edit</BaseButton>
         <BaseButton variant="danger" size="sm" outline @click="onDelete">Delete</BaseButton>
+
         <BaseButton
-            v-if="task.status !== 'completed'"
+          v-if="task.status === 'pending'"
+          variant="info"
+          size="sm"
+          outline
+          @click="onToggleInProgress"
+        >
+          Mark In Progress
+        </BaseButton>
+
+        <BaseButton
+            v-if="task.status === 'pending' || task.status === 'in-progress'"
             variant="success"
             size="sm"
             outline
@@ -95,8 +107,9 @@ const onTogglePending = () => emit('togglePending', props.task.id);
         >
           Mark Completed
         </BaseButton>
+
         <BaseButton
-            v-if="task.status === 'completed'"
+            v-if="task.status === 'completed' || task.status === 'in-progress'"
             variant="warning"
             size="sm"
             outline
