@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineProps, defineEmits, withDefaults, getCurrentInstance } from 'vue';
+import { computed, getCurrentInstance } from 'vue';
 
 type InputType = 'text' | 'email' | 'password' | 'number' | 'date' | 'tel' | 'url' | 'search';
 

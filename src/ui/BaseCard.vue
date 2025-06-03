@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineProps, withDefaults, useSlots } from 'vue';
+import { computed, useSlots } from 'vue';
 
 interface Props {
   padding?: 'none' | 'sm' | 'md' | 'lg';

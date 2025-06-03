@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineProps, defineEmits, withDefaults } from 'vue';
+import { computed } from 'vue';
 
 type ButtonType = 'button' | 'submit' | 'reset';
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'success' | 'warning' | 'ghost';

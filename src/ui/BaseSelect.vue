@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineProps, defineEmits, withDefaults, getCurrentInstance } from 'vue';
+import { computed, getCurrentInstance } from 'vue';
 
 export interface SelectOption {
   [key: string]: any;
