@@ -1,38 +1,3 @@
-<template>
-  <div class="container mx-auto p-4">
-    <header class="mb-8 text-center">
-      <h1 class="text-4xl font-bold text-sky-700">TaskMaster</h1>
-    </header>
-
-    <main>
-      <div class="mb-6 text-right">
-        <BaseButton v-if="!showTaskForm" @click="openAddTaskForm" variant="primary">
-          Add New Task
-        </BaseButton>
-      </div>
-
-      <Transition name="form-slide-fade">
-        <section v-if="showTaskForm" class="mb-8 form-wrapper">
-          <h2 class="text-2xl font-semibold mb-4 text-gray-700">
-            {{ taskToEdit ? 'Edit Task' : 'Create a New Task' }}
-          </h2>
-          <TaskForm
-              :task-to-edit="taskToEdit"
-              @submit-task="handleTaskSubmit"
-              @cancel="closeTaskForm"
-          />
-        </section>
-      </Transition>
-
-      <TaskList @request-edit-task="prepareTaskForEdit" />
-    </main>
-
-    <footer class="mt-12 text-center text-sm text-gray-500">
-      <p>&copy; {{ new Date().getFullYear() }} TaskMaster. Built with Vue 3 & Love.</p>
-    </footer>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { ref } from 'vue';
 import TaskList from '@/components/TaskList.vue';
@@ -79,7 +44,40 @@ const handleTaskSubmit = (taskDataFromForm: Omit<Task, 'id' | 'createdAt'> | Tas
   closeTaskForm();
 };
 </script>
+<template>
+  <div class="container mx-auto p-4">
+    <header class="mb-8 text-center">
+      <h1 class="text-4xl font-bold text-sky-700">TaskMaster</h1>
+    </header>
 
+    <main>
+      <div class="mb-6 text-right">
+        <BaseButton v-if="!showTaskForm" @click="openAddTaskForm" variant="primary">
+          Add New Task
+        </BaseButton>
+      </div>
+
+      <Transition name="form-slide-fade">
+        <section v-if="showTaskForm" class="mb-8 form-wrapper">
+          <h2 class="text-2xl font-semibold mb-4 text-gray-700">
+            {{ taskToEdit ? 'Edit Task' : 'Create a New Task' }}
+          </h2>
+          <TaskForm
+              :task-to-edit="taskToEdit"
+              @submit-task="handleTaskSubmit"
+              @cancel="closeTaskForm"
+          />
+        </section>
+      </Transition>
+
+      <TaskList @request-edit-task="prepareTaskForEdit" />
+    </main>
+
+    <footer class="mt-12 text-center text-sm text-gray-500">
+      <p>&copy; {{ new Date().getFullYear() }} TaskMaster. Built with Vue 3 & Love.</p>
+    </footer>
+  </div>
+</template>
 <style>
 body {
   background-color: #f7fafc;
