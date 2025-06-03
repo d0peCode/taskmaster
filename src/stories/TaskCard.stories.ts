@@ -29,6 +29,7 @@ const meta: Meta<typeof TaskCard> = {
         onDelete: { action: 'deleteClicked' },
         onToggleComplete: { action: 'toggleCompleteClicked' },
         onTogglePending: { action: 'togglePendingClicked' },
+        onToggleInProgress: { action: 'toggleInProgressClicked' },
     },
 };
 
@@ -48,6 +49,7 @@ export const PendingTask: Story = {
         onDelete: fn<TaskIdArgs, void>(),
         onToggleComplete: fn<TaskIdArgs, void>(),
         onTogglePending: fn<TaskIdArgs, void>(),
+        onToggleInProgress: fn<TaskIdArgs, void>(),
     },
     play: async ({ canvasElement, args }) => {
         const canvas = within(canvasElement);
@@ -55,10 +57,12 @@ export const PendingTask: Story = {
 
         const editButton = canvas.getByRole('button', { name: /Edit/i });
         const deleteButton = canvas.getByRole('button', { name: /Delete/i });
+        const markInProgressButton = canvas.getByRole('button', { name: /Mark In Progress/i });
         const markCompleteButton = canvas.getByRole('button', { name: /Mark Completed/i });
 
         const onEditMock = args.onEdit as ReturnType<typeof fn<TaskIdArgs, void>>;
         const onDeleteMock = args.onDelete as ReturnType<typeof fn<TaskIdArgs, void>>;
+        const onToggleInProgressMock = args.onToggleInProgress as ReturnType<typeof fn<TaskIdArgs, void>>;
         const onToggleCompleteMock = args.onToggleComplete as ReturnType<typeof fn<TaskIdArgs, void>>;
 
         onEditMock.mockClear();
@@ -70,6 +74,11 @@ export const PendingTask: Story = {
         await userEvent.click(deleteButton);
         expect(onDeleteMock).toHaveBeenCalledTimes(1);
         expect(onDeleteMock).toHaveBeenCalledWith(taskArg.id);
+
+        onToggleInProgressMock.mockClear();
+        await userEvent.click(markInProgressButton);
+        expect(onToggleInProgressMock).toHaveBeenCalledTimes(1);
+        expect(onToggleInProgressMock).toHaveBeenCalledWith(taskArg.id);
 
         onToggleCompleteMock.mockClear();
         await userEvent.click(markCompleteButton);
@@ -93,20 +102,29 @@ export const InProgressTask: Story = {
         onDelete: fn<TaskIdArgs, void>(),
         onToggleComplete: fn<TaskIdArgs, void>(),
         onTogglePending: fn<TaskIdArgs, void>(),
+        onToggleInProgress: fn<TaskIdArgs, void>(),
     },
     play: async ({ canvasElement, args }) => {
         const canvas = within(canvasElement);
         const taskArg = args.task as Task;
 
         const markCompleteButton = canvas.getByRole('button', { name: /Mark Completed/i });
+        const markPendingButton = canvas.getByRole('button', { name: /Mark Pending/i });
+
         const onToggleCompleteMock = args.onToggleComplete as ReturnType<typeof fn<TaskIdArgs, void>>;
+        const onTogglePendingMock = args.onTogglePending as ReturnType<typeof fn<TaskIdArgs, void>>;
 
         onToggleCompleteMock.mockClear();
         await userEvent.click(markCompleteButton);
         expect(onToggleCompleteMock).toHaveBeenCalledTimes(1);
         expect(onToggleCompleteMock).toHaveBeenCalledWith(taskArg.id);
 
-        expect(canvas.queryByRole('button', { name: /Mark Pending/i })).not.toBeInTheDocument();
+        onTogglePendingMock.mockClear();
+        await userEvent.click(markPendingButton);
+        expect(onTogglePendingMock).toHaveBeenCalledTimes(1);
+        expect(onTogglePendingMock).toHaveBeenCalledWith(taskArg.id);
+
+        expect(canvas.queryByRole('button', { name: /Mark In Progress/i })).not.toBeInTheDocument();
     }
 };
 
@@ -124,6 +142,7 @@ export const CompletedTaskStory: Story = {
         onDelete: fn<TaskIdArgs, void>(),
         onToggleComplete: fn<TaskIdArgs, void>(),
         onTogglePending: fn<TaskIdArgs, void>(),
+        onToggleInProgress: fn<TaskIdArgs, void>(),
     },
     play: async ({ canvasElement, args }) => {
         const canvas = within(canvasElement);
@@ -138,6 +157,7 @@ export const CompletedTaskStory: Story = {
         expect(onTogglePendingMock).toHaveBeenCalledWith(taskArg.id);
 
         expect(canvas.queryByRole('button', { name: /Mark Completed/i })).not.toBeInTheDocument();
+        expect(canvas.queryByRole('button', { name: /Mark In Progress/i })).not.toBeInTheDocument();
     },
 };
 
