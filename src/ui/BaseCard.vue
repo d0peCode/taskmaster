@@ -1,19 +1,3 @@
-<template>
-  <div :class="cardClasses">
-    <div v-if="$slots.header || headerText" :class="headerClasses">
-      <slot name="header">
-        <h3 v-if="headerText" class="text-lg font-semibold text-gray-700">{{ headerText }}</h3>
-      </slot>
-    </div>
-    <div :class="bodyClasses">
-      <slot />
-    </div>
-    <div v-if="$slots.footer" :class="footerClasses">
-      <slot name="footer" />
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { computed, useSlots } from 'vue';
 
@@ -82,5 +66,19 @@ const footerClasses = computed(() => [
     'px-4 py-3 sm:px-6': props.padding !== 'none' || slots.footer,
   }
 ]);
-
 </script>
+<template>
+  <div :class="cardClasses">
+    <div v-if="$slots.header || headerText" :class="headerClasses">
+      <slot name="header">
+        <h3 v-if="headerText" class="text-lg font-semibold text-gray-700">{{ headerText }}</h3>
+      </slot>
+    </div>
+    <div :class="bodyClasses">
+      <slot />
+    </div>
+    <div v-if="$slots.footer" :class="footerClasses">
+      <slot name="footer" />
+    </div>
+  </div>
+</template>
