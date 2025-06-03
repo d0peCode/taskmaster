@@ -47,13 +47,13 @@ const statusBadgeClasses = (status: TaskStatus): string => {
 const statusBorderColor = computed(() => {
   switch (props.task.status) {
     case 'pending':
-      return 'border-yellow-300';
+      return 'border-yellow-500';
     case 'in-progress':
-      return 'border-sky-300';
+      return 'border-sky-600';
     case 'completed':
-      return 'border-green-300';
+      return 'border-green-700';
     default:
-      return 'border-gray-200';
+      return 'border-gray-300';
   }
 });
 
@@ -62,6 +62,7 @@ const onDelete = () => emit('delete', props.task.id);
 const onToggleComplete = () => emit('toggleComplete', props.task.id);
 const onTogglePending = () => emit('togglePending', props.task.id);
 const onToggleInProgress = () => emit('toggleInProgress', props.task.id);
+
 </script>
 <template>
   <BaseCard :border-color="statusBorderColor" class="hover:shadow-lg transition-shadow duration-300 ease-in-out">
@@ -77,7 +78,7 @@ const onToggleInProgress = () => emit('toggleInProgress', props.task.id);
       </div>
     </template>
 
-    <p class="text-gray-600 mb-3 text-sm">{{ task.description }}</p>
+    <p class="text-gray-600 mb-3 text-sm break-words">{{ task.description }}</p>
     <div class="text-sm text-gray-500 mb-4">
       <p><strong>Due:</strong> {{ formatDate(task.dueDate) }}</p>
       <p class="mt-1"><strong>Created:</strong> {{ formatDate(task.createdAt) }}</p>
