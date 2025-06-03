@@ -6,8 +6,8 @@ import { format as formatDateFn } from 'date-fns';
 
 type SubmitTaskPayload = Omit<Task, 'id' | 'createdAt'> | Task;
 
-type OnSubmitTaskArgs = [taskData: SubmitTaskPayload];
-type OnCancelArgs = [];
+type OnSubmitTaskArgsTuple = [taskData: SubmitTaskPayload];
+type OnCancelArgsTuple = [];
 
 const createSampleTaskForEdit = (overrides: Partial<Task> = {}): Task => ({
     id: 'edit-task-123',
@@ -27,7 +27,7 @@ const meta: Meta<typeof TaskForm> = {
         taskToEdit: {
             control: 'object',
             description: 'Task object to pre-fill the form for editing. Null for add mode.',
-        },
+        }
     },
 };
 
@@ -39,8 +39,8 @@ export const AddMode: Story = {
     name: 'Add New Task Mode',
     args: {
         taskToEdit: null,
-        'onSubmit-task': fn<OnSubmitTaskArgs, void>(),
-        onCancel: fn<OnCancelArgs, void>(),
+        'onSubmit-task': fn<OnSubmitTaskArgsTuple, void>(),
+        onCancel: fn<OnCancelArgsTuple, void>(),
     },
     play: async ({ canvasElement, args }) => {
         const canvas = within(canvasElement);
@@ -49,14 +49,14 @@ export const AddMode: Story = {
         const dueDateInput = canvas.getByLabelText(/Due Date/i);
         const submitButton = canvas.getByRole('button', { name: /Add Task/i });
 
-        const onSubmitTaskMock = args['onSubmit-task'] as ReturnType<typeof fn<OnSubmitTaskArgs, void>>;
+        const onSubmitTaskMock = args['onSubmit-task'] as ReturnType<typeof fn<OnSubmitTaskArgsTuple, void>>;
         onSubmitTaskMock.mockClear();
 
         await userEvent.type(titleInput, 'New Task via Storybook');
         await userEvent.type(descriptionInput, 'A cool description.');
         const futureDate = formatDateFn(new Date(new Date().setDate(new Date().getDate() + 3)), 'yyyy-MM-dd');
 
-        (dueDateInput as HTMLInputElement).value = '';
+        await userEvent.clear(dueDateInput);
         await userEvent.type(dueDateInput, futureDate);
 
         await userEvent.click(submitButton);
@@ -81,8 +81,8 @@ export const EditMode: Story = {
             description: 'Initial description for editing.',
             status: 'in-progress',
         }),
-        'onSubmit-task': fn<OnSubmitTaskArgs, void>(),
-        onCancel: fn<OnCancelArgs, void>(),
+        'onSubmit-task': fn<OnSubmitTaskArgsTuple, void>(),
+        onCancel: fn<OnCancelArgsTuple, void>(),
     },
     play: async ({ canvasElement, args }) => {
         const canvas = within(canvasElement);
@@ -90,7 +90,7 @@ export const EditMode: Story = {
         const statusSelect = canvas.getByLabelText(/Status/i) as HTMLSelectElement;
         const submitButton = canvas.getByRole('button', { name: /Save Changes/i });
 
-        const onSubmitTaskMock = args['onSubmit-task'] as ReturnType<typeof fn<OnSubmitTaskArgs, void>>;
+        const onSubmitTaskMock = args['onSubmit-task'] as ReturnType<typeof fn<OnSubmitTaskArgsTuple, void>>;
         onSubmitTaskMock.mockClear();
 
         expect(titleInput.value).toBe('Task to Be Edited');
@@ -111,11 +111,11 @@ export const EditMode: Story = {
 };
 
 export const WithValidationErrors: Story = {
-    name: 'Validation Errors Displayed',
+    name: 'Native Validation Handling',
     args: {
         taskToEdit: null,
-        'onSubmit-task': fn<OnSubmitTaskArgs, void>(),
-        onCancel: fn<OnCancelArgs, void>(),
+        'onSubmit-task': fn<OnSubmitTaskArgsTuple, void>(),
+        onCancel: fn<OnCancelArgsTuple, void>(),
     },
     play: async ({ canvasElement, args }) => {
         const canvas = within(canvasElement);
@@ -123,25 +123,40 @@ export const WithValidationErrors: Story = {
         const titleInput = canvas.getByLabelText(/Title/i) as HTMLInputElement;
         const dueDateInput = canvas.getByLabelText(/Due Date/i) as HTMLInputElement;
 
-        const onSubmitTaskMock = args['onSubmit-task'] as ReturnType<typeof fn<OnSubmitTaskArgs, void>>;
+        const onSubmitTaskMock = args['onSubmit-task'] as ReturnType<typeof fn<OnSubmitTaskArgsTuple, void>>;
         onSubmitTaskMock.mockClear();
 
         await userEvent.clear(titleInput);
-        (dueDateInput as HTMLInputElement).value = '';
+        await userEvent.clear(dueDateInput);
 
         await userEvent.click(submitButton);
 
         await expect(onSubmitTaskMock).not.toHaveBeenCalled();
-        await expect(canvas.getByText('Title is required.')).toBeInTheDocument();
-        await expect(canvas.getByText('Due date is required.')).toBeInTheDocument();
+
+        expect(titleInput.checkValidity()).toBe(false);
+        expect(titleInput.validity.valueMissing).toBe(true);
+
+        expect(dueDateInput.checkValidity()).toBe(false);
+        expect(dueDateInput.validity.valueMissing).toBe(true);
+
+        expect(canvas.queryByText('Title is required.')).not.toBeInTheDocument();
+        expect(canvas.queryByText('Due date is required.')).not.toBeInTheDocument();
 
         await userEvent.type(titleInput, 'Valid Title');
         const validDate = formatDateFn(new Date(new Date().setDate(new Date().getDate() + 1)), 'yyyy-MM-dd');
-        (dueDateInput as HTMLInputElement).value = '';
+
+        await userEvent.clear(dueDateInput);
         await userEvent.type(dueDateInput, validDate);
 
         await userEvent.click(submitButton);
+
         await expect(onSubmitTaskMock).toHaveBeenCalledTimes(1);
+        await expect(onSubmitTaskMock.mock.calls[0][0]).toEqual(
+            expect.objectContaining({
+                title: 'Valid Title',
+                dueDate: validDate,
+            })
+        );
     },
 };
 
@@ -149,15 +164,15 @@ export const CancelButton: Story = {
     name: 'Cancel Button Interaction',
     args: {
         taskToEdit: null,
-        'onSubmit-task': fn<OnSubmitTaskArgs, void>(),
-        onCancel: fn<OnCancelArgs, void>(),
+        'onSubmit-task': fn<OnSubmitTaskArgsTuple, void>(),
+        onCancel: fn<OnCancelArgsTuple, void>(),
     },
     play: async ({ canvasElement, args }) => {
         const canvas = within(canvasElement);
         const cancelButton = canvas.getByRole('button', { name: /Cancel/i });
 
-        const onCancelMock = args.onCancel as ReturnType<typeof fn<OnCancelArgs, void>>;
-        const onSubmitTaskMock = args['onSubmit-task'] as ReturnType<typeof fn<OnSubmitTaskArgs, void>>;
+        const onCancelMock = args.onCancel as ReturnType<typeof fn<OnCancelArgsTuple, void>>;
+        const onSubmitTaskMock = args['onSubmit-task'] as ReturnType<typeof fn<OnSubmitTaskArgsTuple, void>>;
         onCancelMock.mockClear();
         onSubmitTaskMock.mockClear();
 
